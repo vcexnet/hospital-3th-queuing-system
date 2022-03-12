@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+
+    <title>显屏</title>
+    <link th:href="@{/css/SelfService.css}"  rel="stylesheet">
+    <script th:src="@{/js/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/js/SelfService.js}" ></script>
+</head>
+<body>
+<div id="first">
+    <p class="windowNo" th:text="${windowNo}" hidden></p>
+    <p class="clinicAreaNo" th:text="${clinicAreaNo}" hidden></p>
+
+    <img th:src="@{/images/bk.png}" id="backgroundImg" alt="" src="">
+<!--       窗口号        -->
+    <div id="windowNoBox">
+        <span id="windowNO" >301</span>
+    </div>
+
+    <div id="second">
+<!--       标题       -->
+            <div id="titleBox">
+                <span id="windowName">预交金/出院结算</span>
+            </div>
+
+
+<!--       排队信息   -->
+        <div id="queueUpBox">
+
+            <!-- 正在办理     -->
+            <div id="nowClient" >
+            <div id="NowTransact"></div>
+            </div>
+
+            <!--  等待办理     -->
+            <div id="nextClient">
+                <div id="firstWaitTransact"></div>
+                <div id="secondWaitTransact"></div>
+            </div>
+
+        </div>
+
+    </div>
+<!--    提示信息   -->
+    <div id="hintBox" style="">
+        <span> 请保持大厅安静，过好请重新排队取号！</span>
+    </div>
+
+</div>
+
+</body>
+
+</html>

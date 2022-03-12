@@ -1,0 +1,90 @@
+#first{
+    height: 1080px;
+    width: 1920px;
+    position: relative;
+    z-index: auto;
+}
+#backgroundImg {
+    background-repeat: no-repeat;
+}
+#second{
+    position: absolute;
+    z-index: auto;
+    height: 941px;
+    width: 1278px;
+    left: 637px;
+    top: 6px;
+    font-weight: 600;
+}
+/*窗口号*/
+#windowNoBox{
+    position: absolute;
+    width: 500px;
+    height: 381px;
+    text-align: center;
+    z-index: 2;
+    left: 51px;
+    top: 136px;
+}
+#windowNoBox span{
+    font-weight: bold;
+    font-size: 300px;
+    line-height: 380px;
+}
+/*标题信息*/
+#titleBox{
+    position: absolute;
+    z-index: 2;
+    height: 293px;
+    width: 1190px;
+    text-align: center;
+    left: 37px;
+    top: 18px;
+}
+#titleBox span{
+    font-weight: bold;
+    font-size: 150px;
+    line-height: 293px;
+    color: aliceblue;
+}
+/*排队信息*/
+#queueUpBox{
+    position: absolute;
+    z-index: 2;
+    font-size:100px;
+    display: flex;
+    text-align: center;
+    left: 20px;
+    top: 570px;
+    color:#C42021;
+}
+#nowClient{
+    z-index: 3;
+    width: 610px;
+    height: 320px;
+}
+#nextClient{
+    z-index: 3;
+    width: 610px;
+    height: 320px;
+    margin-left: 25px;
+}
+#nextClient div{
+    height: 150px;
+    margin-top: 9px;
+}
+/*提示信息*/
+#hintBox{
+    position: absolute;
+    z-index: 2;
+    height: 125px;
+    width: 1920px;
+    top: 950px;
+    font-size:75px;
+    text-align: center;
+    line-height: 125px;
+    font-weight: 600
+}
+#hintBox span{
+    letter-spacing: 20px;
+}

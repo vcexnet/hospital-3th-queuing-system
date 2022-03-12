@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>医生信息</title>
+    <link th:href="@{/css/index.css}" rel="stylesheet" />
+    <script th:src="@{/js/jquery.js}"></script>
+</head>
+<body style="background: url('images/background.png') no-repeat fixed; background-size: cover;margin: 0;padding: 0;">
+<!-- 一、标题信息边框开始 -->
+<div id="titleBox">
+    <p id="outpatientServiceNo" th:text="${initInfo.getOutpatientServiceNo()}" hidden></p>
+    <p id="queueNo" th:text="${initInfo.getQueueNo()}" hidden></p>
+    <img id="logoImg" src="images/logo2.png" />
+    <div id="titleTextBox">
+        <span id="titleText"></span>
+    </div>
+    <div class="timeTextBox">
+        <p class="timeText" id="YMD">2021年11月12日</p>   <!-- 年月日 -->
+        <p class="titleText"><span id="week">星期五</span>&emsp;&nbsp;<span id="HMS">10:52</span></p> <!-- 星期时分秒 -->
+    </div>
+</div>
+<!-- 标题信息边框结束 -->
+
+<!-- 二、诊室号边框开始 -->
+<div id="officeNoBox">
+    <span id="officeNoText">&emsp;&emsp;&emsp;</span>
+</div>
+<!-- 诊室号边框结束 -->
+
+<!-- 三、医生信息边框开始 -->
+<div id="doctorInfoBox">
+    <img id="photoImg" src="images/photograph.png" />
+    <img id="doctorNameImg" src="images/doctorName.png" />
+    <img id="jobTitleImg" src="images/jobTitle.png" />
+    <div id="doctorNameTextBox">
+        <p id="doctorNameText"></p>
+    </div>
+    <div id="jobTitleTextBox">
+        <p id="jobTitleText"></p>
+    </div>
+    <p id="visitTimeHint">出诊时间 &nbsp; :</p>
+    <p id="visitTimeText"></p>
+    <div id="selfIntroductionBox">
+        <span id="selfIntroductionText">&emsp;&emsp;</span>
+    </div>
+</div>
+<!-- 医生信息边框结束 -->
+
+<!-- 四、排队信息边框开始 -->
+<div id="queuingInfoBox">
+    <div id="seeDoctorBox">
+        <img id="prompts" src="images/prompts.png">
+        <p id="seeDoctorHint">正在就诊</p>
+        <p class="seeDoctorText" id="seeDoctorNumText"></p>
+        <p class="seeDoctorText" id="seeDoctorNameText">暂无</p>
+    </div>
+    <div id="readySeeBox">
+        <img id="prompts1" src="images/prompts1.png">
+        <p id="readySeeHint">准备就诊</p>
+        <p class="readySeeText" id="readySeeNumText"></p>
+        <p class="readySeeText" id="readySeeNameText">暂无</p>
+    </div>
+    <div class="left" id="seeDoctorBox1"></div>
+    <div class="left" id="seeDoctorBox2"></div>
+    <div class="right" id="readySeeBox1"></div>
+    <div class="right" id="readySeeBox2"></div>
+</div>
+<!-- 排队信息边框结束 -->
+
+<!-- 五、过号信息滚动边框开始 -->
+<div id="lateBox">
+    <img id="lateImg" src="images/late2.png">
+    <div id="lateTextBox">
+        <p id="lateText"></p>
+    </div>
+</div>
+<!-- 过号信息滚动边框结束 -->
+
+<!-- 六、病人等待信息边框开始 -->
+<div id="waitingInformationBox">
+    <!-- 等待病人提示信息 -->
+    <div id="waitingTextBox">
+        <p class="waitingText">1.实名就诊。</p>
+        <p class="waitingText">2.就诊前请到咨询台或自助机刷电子健康卡二维码签到。</p>
+        <p class="waitingText">3.需要病例或双处方的患者请告知当诊医生。</p>
+        <p class="waitingText">4.就诊后请仔细阅读开具的单据上的信息。</p>
+        <p class="waitingText">5.挂号票据当诊有效，复诊及资讯结果请重新挂号</p>
+    </div>
+    <img id="promptsOne" src="images/prompts1.png" />
+    <p id="waitingHint">候诊患者</p>
+    <div id="waitingSickPersonBox">
+        <!-- 候诊病人滚动列表 -->
+        <div id="waitingRollBox">
+        </div>
+    </div>
+</div>
+<!-- 病人等待信息边框结束 -->
+
+<!-- 七、提示信息边框开始 -->
+<div id="hintBox">
+    <div id="hintTextBox">
+        <p id="hintText">复诊病人请提前预约挂号</p>
+    </div>
+</div>
+<!-- 提示信息边框结束 -->
+</body>
+<script>
+    $(function () {
+        //配置文件参数获取
+        const outpatientServiceNo = $("#outpatientServiceNo").text();
+        const queueNo = $("#queueNo").text();
+
+        //病人名称加密处理函数
+        function theNameOfTheEncryption(name) {
+            let newName = "";
+            if(name.length > 2) {
+                for(let i =0;i < name.length;i++) {
+                    if(i != 0 && i != name.length - 1) {
+                        newName += "*"
+                    }else {
+                        newName += name.charAt(i);
+                    }
+                }
+            }else {
+                newName = name.charAt(0) + "*";
+            }
+
+            return newName;
+        }
+
+        //图片byte数组转换函数
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            let bytes = new Uint8Array(buffer);
+            let len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
+        //时间初始化函数
+        function timeInit() {
+            let myDate = new Date($.ajax({
+                async:false
+            }).getResponseHeader("Date"));
+            let year = myDate.getFullYear();
+            let month = myDate.getMonth() + 1;
+            let day = myDate.getDate();
+            let week = myDate.getDay();
+            let hour = myDate.getHours();
+            let minute = myDate.getMinutes();
+            let weeks =  ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+            $("#YMD").text(year + "年" + month + "月" + day + "日");
+            $("#week").text(weeks[week]);
+            $("#HMS").text(hour + ":" + (minute < 10 ? "0" + minute : minute));
+        }
+
+        //异步获取医院标题信息函数
+        function getHospitalTitle() {
+            $.ajax({
+                type:"get",
+                url:"/hospitalTitle",
+                data: {
+                    "queueNo" : queueNo,
+                    "outpatientServiceNo": outpatientServiceNo
+                },
+                success: function (data) {
+                    $("#titleText").text(data.consultingRoomName);
+                    let titleText = data.consultingRoomName;
+                    console.log(data);
+                    console.log(titleText.length);
+                    if(titleText.length > 10) {
+                        $("#titleText").css("font-size","60px");
+                        $("#titleText").css("margin-top","20px");
+                        $("#titleText").css("font-weight","bold");
+                    }
+                    $("#officeNoText").text(data.departmentsName);
+                }
+            });
+        }
+
+        //异步获取医生信息函数
+        function getDoctorInfo() {
+            $.ajax({
+                type: "get",
+                url: "/doctorInfo",
+                data: {
+                    "queueNo" : queueNo,
+                    "outpatientServiceNo": outpatientServiceNo
+                },
+                success: function (data) {
+                    console.log(data);
+                    $("#doctorNameText").text(data.doctorName);
+                    $("#jobTitleText").text(data.doctorJobTitle);
+                    $("#visitTimeText").text(data.doctorWorkTime);
+                    $("#selfIntroductionText").text("  "+data.doctorIntroduction);
+
+                    //医生照片byte数组转为img
+                    let doctorImageStr = arrayBufferToBase64(data.doctorImage);//转换字符串
+                    let outputImg = document.createElement('img');
+                    outputImg.className = 'doctorPhoto';
+                    outputImg.src = 'data:image/png;base64,'+doctorImageStr;
+                    if(data.doctorImage != null){
+                        $("#photoImg").remove();
+                        $("#doctorInfoBox").append(outputImg);
+                    }
+                    //医生二维码照片byte数组转为img
+                    // let doctorQRCodeStr = arrayBufferToBase64(data.doctorQRCode);//转换字符串
+                    // let outputImg2 = document.createElement('img');
+                    // outputImg2.className = 'doctorQRCode';
+                    // outputImg2.src = 'data:image/png;base64,'+doctorQRCodeStr;
+                    // if(data.doctorQRCode != null) {
+                    //     //移除原有二维码图片
+                    //     //将获得的二维码图片添加到里面去
+                    //     $("#QRImg").remove();
+                    //     $(".doctorDefaultQRCodeStr").remove();
+                    //     $("#waitingInformationBox").append(outputImg2);
+                    // }else {
+                    //     //读取默认二维码
+                    //     //移除原有二维码图片
+                    //     //将获得的二维码图片添加到里面去
+                    //     $.ajax({
+                    //         type: 'get',
+                    //         url: '/defaultQRCode',
+                    //         success:function (data) {
+                    //             let doctorDefaultQRCodeStr = arrayBufferToBase64(data);//转换字符串
+                    //             let outputImg3 = document.createElement('img');
+                    //             outputImg3.className = 'doctorDefaultQRCodeStr';
+                    //             outputImg3.src = 'data:image/png;base64,'+doctorDefaultQRCodeStr;
+                    //             $("#QRImg").remove();
+                    //             $(".doctorQRCode").remove();
+                    //             $("#waitingInformationBox").append(outputImg3);
+                    //         }
+                    //     })
+                    // }
+                }
+            });
+        }
+
+        //异步获取队列中不同状态德患者信息
+        function getPatientList() {
+            //回诊数组
+            let returnVisitArr = [];
+            //回诊获取
+            $.ajax({
+                type: "get",
+                url: "/patientList",
+                data: {
+                    "queueNo" : queueNo,
+                    "outpatientServiceNo": outpatientServiceNo,
+                    'type': '回诊'
+                },
+                success: function (data) {
+                    for(let i = 0;i < data.length;i++) {
+                        returnVisitArr.push(data[i].patientNo + '号' + theNameOfTheEncryption(data[i].patientName) + "（回）")
+                    }
+                    console.log(returnVisitArr);
+                }
+            });
+            //候诊获取
+            $.ajax({
+                type: "get",
+                url: "/patientList",
+                data: {
+                    "queueNo" : queueNo,
+                    "outpatientServiceNo": outpatientServiceNo,
+                    'type': '候诊'
+                },
+                success: function (data) {
+                    console.log(data);
+                    $(".waitingSickPersonText").remove();
+                    for(let i = 0;i < data.length;i++) {
+                        $("#waitingRollBox").append("<p class=\"waitingSickPersonText\" >"+ data[i].patientNo + '号' + theNameOfTheEncryption(data[i].patientName) +"</p>")
+                    }
+                }
+            });
+            //待诊获取
+            $.ajax({
+                type: "get",
+                url: "/patientList",
+                contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+                data: {
+                    "queueNo" : queueNo,
+                    "outpatientServiceNo": outpatientServiceNo,
+                    'type': '待诊'
+                },
+                success: function (data) {
+                    console.log(data);
+                    if (data.length == 0) {
+                        console.log("待诊病人未找到");
+                    }else {
+                        $("#readySeeNumText").text(data[0].patientNo + "号");
+                        $("#readySeeNameText").text(theNameOfTheEncryption(data[0].patientName));
+                    }
+                }
+            });
+            //正在就诊获取
+            $.ajax({
+                type: "get",
+                url: "/patientList",
+                data: {
+                    "queueNo" : queueNo,
+                    "outpatientServiceNo": outpatientServiceNo,
+                    'type': '在诊'
+                },
+                success: function (data) {
+                    console.log(data);
+                    if (data.length == 0) {
+                        console.log("在诊病人未找到")
+                    }else {
+                        $("#seeDoctorNumText").text(data[0].patientNo + "号");
+                        $("#seeDoctorNameText").text(theNameOfTheEncryption(data[0].patientName));
+                    }
+                }
+            });
+            //过号患者获取
+            $.ajax({
+                type: "get",
+                url: "/patientList",
+                data: {
+                    "queueNo" : queueNo,
+                    "outpatientServiceNo": outpatientServiceNo,
+                    'type': '过号'
+                },
+                success: function (data) {
+                    console.log(data);
+                    let lateText = "";
+                    for(let i = 0;i < data.length;i++) {
+                        lateText += data[i].patientNo + "号" + data[i].patientName + "  "
+                    }
+                    $("#lateText").text(lateText);
+                }
+            });
+        }
+
+        //异步获取提示信息
+        function getHintInfo() {
+            $.ajax({
+                type: "get",
+                url: "/hint",
+                data: {
+                    "queueNo" : queueNo,
+                    "outpatientServiceNo": outpatientServiceNo,
+                },
+                success: function (data) {
+                    console.log("固定提示信息" + data.fixedInformation)
+                    if(data.fixedInformation != null) {
+                        $(".waitingText").remove();
+                        $(".fixedInformation").remove();
+                        let hintArray = new Array();
+                        //提取字符串中数字
+                        let tempStrArr = data.fixedInformation.split("");
+                        let tempNumArr = [];
+                        for(let i in tempStrArr) {
+                            if(!isNaN(tempStrArr[i])) {
+                                tempNumArr.push(tempStrArr[i]);
+                            }
+                        }
+
+                        //查看对应数字的下标并在下标后添加\r\n
+                        for(let i = 1;i < tempNumArr.length;i++) {
+                            let index = data.fixedInformation.indexOf(tempNumArr[i]);
+                            data.fixedInformation = data.fixedInformation.slice(0,index) + "\\r\\n" + data.fixedInformation.slice(index)
+                        }
+
+
+                        hintArray = data.fixedInformation.split("\\r\\n");
+                        for(let i = 0;i < hintArray.length;i++){
+                            $("#waitingTextBox").append("<p class='fixedInformation'>" + hintArray[i] + "</p>");
+                        }
+                        // $("#waitingTextBox").append("<p class='fixedInformation'>" + data.fixedInformation + "</p>");
+
+                    }
+                    if(data.scrollingMessage != null) {
+                        $("#hintText").text(data.scrollingMessage);
+                    }
+                }
+            });
+        }
+
+
+
+        timeInit();
+        getHospitalTitle();
+        getDoctorInfo();
+        getPatientList();
+        getHintInfo();
+
+        //提示信息1小时刷新一次
+        setInterval(function () {
+            getHintInfo();
+        },3600000)
+
+        //标题信息 医生信息 时间信息 2秒刷新一次
+        setInterval(function () {
+            getHospitalTitle();
+            getDoctorInfo();
+            timeInit();
+        },60000);
+
+        // 患者排队信息
+        setInterval(function () {
+            getPatientList();
+        },10000)
+    })
+</script>
+</html>

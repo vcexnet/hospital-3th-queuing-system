@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cdold.hqcs.dao.SelfServiceDao">
+
+    <resultMap id="windowMap" type="com.cdold.hqcs.entity.SelfServiceWindow">
+        <result column="windowNo" property="windowNo"/>
+        <result column="windowName" property="windowName"/>
+        <result column="clinicAreaName" property="clinicAreaName"/>
+    </resultMap>
+
+
+    <select id="getSelfServiceWindow" resultMap="windowMap">
+        <!--    窗口号 TBZDDL - CBZ  窗口名称 TBZDDL - CMC-->
+        select DL.CBZ windowNo ,DL.CMC windowName,FZ.CMC clinicAreaName
+        from dbo.TBZDDL as DL inner join TBZDFZ FZ on dl.CFZBM = FZ.CBM
+        where DL.CBM =  #{windowNo}
+    </select>
+
+</mapper>

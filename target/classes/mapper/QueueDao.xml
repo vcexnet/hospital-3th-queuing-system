@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cdold.hqcs.dao.QueueDao">
+    <select id="getQueue" resultType="com.cdold.hqcs.entity.Patient">
+
+        <foreach item="tableName" index="i" collection="tableNames" separator="union all">
+            select IPDXH as patientNo,CXM as patientName,CJZZT as patientType
+            from ${tableName}
+            where CDLBM = #{queueNo} and CJZZT = #{type}
+        </foreach>
+
+    </select>
+</mapper>

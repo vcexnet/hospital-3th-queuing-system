@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cdold.hqcs.dao.HintDao">
+    <select id="getScrollingMessage" resultType="java.lang.String">
+        select TOP (1) CYSXX as scrollingMessage
+        from dbo.TBZDTS
+        where ITYPE = 3 and CDLBM = #{queueNo}
+    </select>
+
+    <select id="getFixedInformation" resultType="java.lang.String">
+        select TOP (1) CYSXX as fixedInformation
+        from dbo.TBZDTS
+        where ITYPE = 1 and CDLBM = #{queueNo}
+    </select>
+</mapper>

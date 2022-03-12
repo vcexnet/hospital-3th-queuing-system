@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cdold.hqcs.dao.DoctorInfoDao">
+    <!-- 通过队列编码查询医生编码 再通过医生编码获取医生信息   医生二维码获取P2WM as doctorQRCode-->
+    <select id="getDoctorInfo" resultType="com.cdold.hqcs.entity.DoctorInfo">
+        select CMC as doctorName,CZC as doctorJobTitle,CSBSJ as doctorWorkTime,CBZ as doctorIntroduction,PTP as doctorImage
+        from dbo.TBZDRY
+        where CBM in (select CYSBM from TBZDDL where CBM = #{queueNo})
+    </select>
+
+    <select id="getDefaultQRCode" resultType="com.cdold.hqcs.entity.DoctorInfo">
+        select PTP as doctorQRCode
+        from dbo.TBZDRY
+        where CYYBM = 'mr2wm'
+    </select>
+</mapper>
